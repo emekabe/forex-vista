@@ -1,0 +1,104 @@
+<div class="history-page animate-fade-in">
+
+  <div class="flex items-center justify-between mb-6">
+    <div class="page-header" style="margin-bottom:0">
+      <h1>Trade History</h1>
+      <p>Your complete trading record</p>
+    </div>
+    <button class="btn btn-danger" (click)="reset()">Reset Account</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid-4 mb-6">
+    <app-stat-card label="Total Trades" [value]="stats.totalTrades" [decimals]="0" [sublabel]="stats.winningTrades + 'W / ' + stats.losingTrades + 'L'" />
+    <app-stat-card label="Win Rate"     [value]="stats.totalTrades > 0 ? stats.winRate : 0" suffix="%" [decimals]="1" [highlight]="stats.winRate >= 50 ? 'positive' : 'negative'" />
+    <app-stat-card label="Total P&amp;L"    [value]="stats.totalPnl"    prefix="$" [highlight]="stats.totalPnl >= 0 ? 'positive' : 'negative'" />
+    <app-stat-card label="Best Trade"   [value]="stats.bestTrade > 0 ? stats.bestTrade : 0"   prefix="$" highlight="positive" [sublabel]="stats.worstTrade < 0 ? 'Worst: $' + stats.worstTrade.toFixed(2) : ''" />
+  </div>
+
+  <!-- Win/Loss Bar -->
+  @if (stats.totalTrades > 0) {
+    <div class="card mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm text-muted">Win / Loss ratio</span>
+        <span class="text-sm mono">
+          <span class="profit">{{ stats.winningTrades }} wins</span>
+          &nbsp;·&nbsp;
+          <span class="loss">{{ stats.losingTrades }} losses</span>
+        </span>
+      </div>
+      <div class="ratio-bar">
+        <div class="ratio-win"  [style.width.%]="stats.winRate"></div>
+        <div class="ratio-loss" [style.width.%]="100 - stats.winRate"></div>
+      </div>
+    </div>
+  }
+
+  <!-- Filters -->
+  <div class="filters card mb-4">
+    <div class="flex items-center gap-3 flex-wrap">
+      <div class="form-group" style="flex-direction:row; align-items:center; gap:.5rem; margin:0">
+        <label class="form-label" style="margin:0; white-space:nowrap">Direction</label>
+        <select class="form-control" style="width:auto" [ngModel]="filterDir()" (ngModelChange)="filterDir.set($event)">
+          <option value="ALL">All</option>
+          <option value="BUY">BUY</option>
+          <option value="SELL">SELL</option>
+        </select>
+      </div>
+      <div class="form-group" style="flex-direction:row; align-items:center; gap:.5rem; margin:0">
+        <label class="form-label" style="margin:0">Pair</label>
+        <select class="form-control" style="width:auto" [ngModel]="filterSymb()" (ngModelChange)="filterSymb.set($event)">
+          @for (sym of allSymbols(); track sym) {
+            <option [value]="sym">{{ sym }}</option>
+          }
+        </select>
+      </div>
+      <span class="text-muted text-sm" style="margin-left:auto">{{ filtered().length }} trade(s)</span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Pair</th>
+          <th>Dir</th>
+          <th class="sortable" (click)="sort('lots')">Lots {{ sortField() === 'lots' ? (sortAsc() ? '↑' : '↓') : '' }}</th>
+          <th>Leverage</th>
+          <th>Open Price</th>
+          <th>Close Price</th>
+          <th class="sortable" (click)="sort('pnl')">P&amp;L {{ sortField() === 'pnl' ? (sortAsc() ? '↑' : '↓') : '' }}</th>
+          <th>Pips</th>
+          <th class="sortable" (click)="sort('closeTime')">Closed {{ sortField() === 'closeTime' ? (sortAsc() ? '↑' : '↓') : '' }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (filtered().length === 0) {
+          <tr><td colspan="9" class="empty-cell">
+            <div style="text-align:center; padding:3rem; color:var(--text-muted)">
+              No trades found. <a routerLink="/trade">Start trading →</a>
+            </div>
+          </td></tr>
+        }
+        @for (t of filtered(); track t.id) {
+          <tr>
+            <td><strong class="text-primary">{{ t.symbol }}</strong></td>
+            <td><span class="badge" [class]="t.direction === 'BUY' ? 'badge-green' : 'badge-red'">{{ t.direction }}</span></td>
+            <td class="mono">{{ t.lots }}</td>
+            <td class="mono text-muted">1:{{ t.leverage }}</td>
+            <td class="mono">{{ t.openPrice  | number:'1.4-5' }}</td>
+            <td class="mono">{{ t.closePrice | number:'1.4-5' }}</td>
+            <td class="mono font-semibold" [class]="t.pnl >= 0 ? 'profit' : 'loss'">
+              {{ t.pnl >= 0 ? '+' : '' }}${{ t.pnl | number:'1.2-2' }}
+            </td>
+            <td class="mono text-sm" [class]="t.pipsPnl >= 0 ? 'profit' : 'loss'">
+              {{ t.pipsPnl >= 0 ? '+' : '' }}{{ t.pipsPnl | number:'1.1-1' }}
+            </td>
+            <td class="text-muted text-sm">{{ t.closeTime | date:'MMM d, HH:mm' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

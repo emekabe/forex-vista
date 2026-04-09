@@ -1,0 +1,184 @@
+<div class="trading-page animate-fade-in">
+
+  <!-- Pair Selector Bar -->
+  <div class="pair-bar">
+    <div class="pair-list">
+      @for (p of pairs; track p.symbol) {
+        <button class="pair-btn" [class.active]="selectedPair() === p.symbol" (click)="selectPair(p.symbol)">
+          {{ p.symbol }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Main Trading Layout -->
+  <div class="trading-layout">
+
+    <!-- Left: Chart -->
+    <div class="chart-section card" style="padding: 0; overflow: hidden;">
+      <!-- Chart header -->
+      <div class="chart-header">
+        <div class="chart-pair-info">
+          <h2>{{ selectedPair() }}</h2>
+          @if (currentQuote()) {
+            <div class="price-display" [class.price-flash-green]="priceFlash() === 'up'" [class.price-flash-red]="priceFlash() === 'down'">
+              <span class="price-mid mono">{{ currentQuote()!.mid | number:'1.4-5' }}</span>
+              <span [class]="currentQuote()!.changePercent >= 0 ? 'profit' : 'loss'" class="price-change text-sm mono">
+                {{ currentQuote()!.changePercent >= 0 ? '+' : '' }}{{ currentQuote()!.changePercent | number:'1.2-2' }}%
+              </span>
+            </div>
+            <div class="bid-ask">
+              <span class="loss mono">BID {{ currentQuote()!.bid | number:'1.4-5' }}</span>
+              <span class="spread-dot">·</span>
+              <span class="profit mono">ASK {{ currentQuote()!.ask | number:'1.4-5' }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Timeframe selector -->
+        <div class="tf-selector">
+          @for (tf of timeframes; track tf.value) {
+            <button class="tf-btn" [class.active]="selectedTf() === tf.value" (click)="selectTimeframe(tf.value)">
+              {{ tf.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-wrapper" [class.loading]="chartLoading()">
+        <div #chartEl class="chart-canvas"></div>
+        @if (chartLoading()) {
+          <div class="chart-overlay">
+            <div class="loading-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right: Order Panel + Positions -->
+    <div class="right-panel">
+
+      <!-- Order Panel -->
+      <div class="card order-panel">
+        <h3 class="mb-4">Place Order</h3>
+
+        <!-- Balance -->
+        <div class="balance-row">
+          <span class="text-muted text-xs uppercase" style="letter-spacing:.07em">Available</span>
+          <span class="mono font-bold profit">${{ portfolioSnap.freeMargin | number:'1.2-2' }}</span>
+        </div>
+
+        <!-- Lot Size -->
+        <div class="form-group mt-4">
+          <label class="form-label">Lot Size
+            <span class="has-tooltip" data-tip="1 lot = 100,000 units. Mini lot = 0.1. Micro = 0.01">ⓘ</span>
+          </label>
+          <input class="form-control mono" type="number"
+                 [ngModel]="lots()" (ngModelChange)="lots.set(+$event)"
+                 min="0.01" max="100" step="0.01">
+          @if (currentQuote() && lots() > 0) {
+            @let riskPct = (lots() * 100000 * currentQuote()!.mid / leverage()) / portfolioSnap.balance * 100;
+            <div class="risk-indicator" [class.risk-warn]="riskPct > 5" [class.risk-danger]="riskPct > 15">
+              <span class="risk-dot"></span>
+              Margin {{ (lots() * 100000 * currentQuote()!.mid / leverage()) | number:'1.0-0' }} USD
+              ({{ riskPct | number:'1.1-1' }}% of balance)
+              @if (riskPct > 5) { <strong>— High Risk</strong> }
+            </div>
+          }
+        </div>
+
+        <!-- Leverage -->
+        <div class="form-group mt-3">
+          <label class="form-label">Leverage
+            <span class="has-tooltip" data-tip="Leverage amplifies gains AND losses. Use responsibly.">ⓘ</span>
+          </label>
+          <select class="form-control" [ngModel]="leverage()" (ngModelChange)="leverage.set(+$event)">
+            @for (lev of leverages; track lev) {
+              <option [value]="lev">1:{{ lev }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- SL / TP -->
+        <div class="sltp-grid mt-3">
+          <div class="form-group">
+            <label class="form-label">Stop Loss</label>
+            <input class="form-control mono" type="number"
+                   [ngModel]="stopLoss()" (ngModelChange)="stopLoss.set($event || undefined)"
+                   placeholder="Optional" step="0.0001">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Take Profit</label>
+            <input class="form-control mono" type="number"
+                   [ngModel]="takeProfit()" (ngModelChange)="takeProfit.set($event || undefined)"
+                   placeholder="Optional" step="0.0001">
+          </div>
+        </div>
+
+        <!-- Margin summary -->
+        @if (currentQuote()) {
+          <div class="margin-info mt-3" [class.margin-warn]="portfolioSnap.marginLevel > 0 && portfolioSnap.marginLevel < 150">
+            <div class="flex items-center gap-2">
+              <span class="text-muted text-xs">Est. Margin:</span>
+              <span class="mono text-sm font-semibold">
+                ${{ (lots() * 100000 * currentQuote()!.mid / leverage()) | number:'1.2-2' }}
+              </span>
+            </div>
+            @if (portfolioSnap.marginLevel > 0 && portfolioSnap.marginLevel < 150) {
+              <span class="badge badge-yellow text-xs">⚠ Low margin</span>
+            }
+          </div>
+        }
+
+        <!-- BUY / SELL -->
+        <div class="order-btns mt-4">
+          <button class="btn btn-buy flex-1" (click)="executeTrade('BUY')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+            BUY
+          </button>
+          <button class="btn btn-sell flex-1" (click)="executeTrade('SELL')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            SELL
+          </button>
+        </div>
+      </div>
+
+      <!-- Open Positions for this pair -->
+      <div class="card positions-panel">
+        <h4 class="mb-3">Open Positions
+          @if (openTrades.length) {
+            <span class="badge badge-blue" style="margin-left:.5rem">{{ openTrades.length }}</span>
+          }
+        </h4>
+
+        @if (openTrades.length === 0) {
+          <p class="text-muted text-sm">No open positions for {{ selectedPair() }}</p>
+        } @else {
+          @for (t of openTrades; track t.id) {
+            <div class="position-row">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="badge badge-sm" [class]="t.direction === 'BUY' ? 'badge-green' : 'badge-red'">{{ t.direction }}</span>
+                  <span class="text-sm font-medium">{{ t.lots }} lot(s)</span>
+                </div>
+                <div class="text-xs text-muted mono">@ {{ t.openPrice | number:'1.4-5' }}</div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="text-right">
+                  <div class="mono font-bold text-sm" [class]="t.pnl >= 0 ? 'profit' : 'loss'">
+                    {{ t.pnl >= 0 ? '+' : '' }}${{ t.pnl | number:'1.2-2' }}
+                  </div>
+                  <div class="text-xs" [class]="t.pipsPnl >= 0 ? 'profit' : 'loss'">{{ t.pipsPnl >= 0 ? '+' : '' }}{{ t.pipsPnl | number:'1.1-1' }} pips</div>
+                </div>
+                <button class="btn btn-sm btn-danger" (click)="closeTrade(t.id)">Close</button>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

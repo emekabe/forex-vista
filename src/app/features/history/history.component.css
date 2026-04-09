@@ -1,0 +1,14 @@
+.filters { padding: 1rem 1.25rem; }
+.sortable { cursor: pointer; user-select: none; }
+.sortable:hover { color: var(--text-primary); }
+.empty-cell { padding: 0 !important; }
+
+.ratio-bar {
+  display: flex;
+  height: 8px;
+  border-radius: var(--r-full);
+  overflow: hidden;
+  background: var(--bg-tertiary);
+}
+.ratio-win  { background: var(--accent-green); transition: width .5s ease; }
+.ratio-loss { background: var(--accent-red);   transition: width .5s ease; }

@@ -1,0 +1,76 @@
+<nav class="navbar">
+  <!-- Logo -->
+  <a class="navbar-brand" routerLink="/dashboard">
+    <div class="brand-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+        <polyline points="16 7 22 7 22 13"></polyline>
+      </svg>
+    </div>
+    <span class="brand-name">Forex<span class="brand-accent">Vista</span></span>
+  </a>
+
+  <!-- Hamburger (mobile only) -->
+  <button class="hamburger" (click)="menuClick.emit()" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <!-- Center: nav links (desktop) -->
+  <div class="navbar-links">
+    <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a routerLink="/trade" routerLinkActive="active" class="nav-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      Trade
+    </a>
+    <a routerLink="/history" routerLinkActive="active" class="nav-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 0 .5-4.5"/><polyline points="3 3 3 10 10 10"/></svg>
+      History
+    </a>
+    <a routerLink="/learn" routerLinkActive="active" class="nav-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      Learn
+    </a>
+  </div>
+
+  <!-- Right: balance + source indicator + theme toggle -->
+  <div class="navbar-right">
+    <!-- Data source badge -->
+    @switch (dataFeed.dataSource()) {
+      @case (DataSourceStatus.LIVE) {
+        <span class="badge badge-green">
+          <span class="live-dot"></span> Live
+        </span>
+      }
+      @case (DataSourceStatus.MOCK) {
+        <span class="badge badge-yellow">⚡ Simulated</span>
+      }
+      @case (DataSourceStatus.LOADING) {
+        <span class="badge badge-gray animate-pulse">Loading…</span>
+      }
+    }
+
+    <!-- Balance chip -->
+    <div class="balance-chip">
+      <span class="balance-label">Balance</span>
+      <span class="balance-value mono">${{ portfolio.portfolio().balance | number:'1.2-2' }}</span>
+    </div>
+
+    <!-- Theme toggle -->
+    <button class="btn-icon" (click)="theme.toggle()" [title]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
+      @if (theme.isDark()) {
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      } @else {
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      }
+    </button>
+  </div>
+</nav>

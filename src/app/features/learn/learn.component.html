@@ -1,0 +1,21 @@
+<div class="learn-page animate-fade-in">
+  <div class="page-header">
+    <h1>Forex Learning Center</h1>
+    <p>Build your trading knowledge from the ground up — from basics to advanced risk management.</p>
+  </div>
+
+  <div class="topics-grid">
+    @for (topic of topics; track topic.slug) {
+      <a [routerLink]="['/learn', topic.slug]" class="topic-card">
+        <div class="topic-emoji">{{ topic.icon }}</div>
+        <div class="topic-meta">
+          <span class="badge" [class]="difficultyClass(topic.difficulty)">{{ topic.difficulty }}</span>
+          <span class="text-muted text-xs">{{ topic.readTime }} read</span>
+        </div>
+        <h3 class="topic-title">{{ topic.title }}</h3>
+        <p class="topic-summary">{{ topic.summary }}</p>
+        <div class="topic-link">Read more →</div>
+      </a>
+    }
+  </div>
+</div>

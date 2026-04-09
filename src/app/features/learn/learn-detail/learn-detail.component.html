@@ -1,0 +1,34 @@
+<div class="learn-detail animate-fade-in">
+  <a routerLink="/learn" class="back-link">← Back to Learning Center</a>
+
+  @if (topic) {
+    <div class="topic-hero">
+      <div class="topic-hero-icon">{{ topic.icon }}</div>
+      <h1>{{ topic.title }}</h1>
+    </div>
+
+    <div class="sections">
+      @for (section of topic.sections; track section.heading) {
+        <div class="section-card card">
+          <h3>{{ section.heading }}</h3>
+          <p>{{ section.body }}</p>
+          @if (section.tip) {
+            <div class="tip-box">
+              <span class="tip-icon">💡</span>
+              <span>{{ section.tip }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="nav-row">
+      <a routerLink="/learn" class="btn btn-ghost">← All Topics</a>
+      <a routerLink="/trade" class="btn btn-primary">Practice Trading →</a>
+    </div>
+  } @else {
+    <div style="text-align:center; padding:4rem; color:var(--text-muted)">
+      <p>Topic not found. <a routerLink="/learn">Return to Learning Center →</a></p>
+    </div>
+  }
+</div>

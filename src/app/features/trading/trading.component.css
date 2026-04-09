@@ -1,0 +1,273 @@
+.trading-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: calc(100vh - var(--navbar-height) - var(--ticker-height) - 3rem);
+}
+
+.pair-bar {
+  background: var(--surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--r-lg);
+  padding: 0.5rem;
+}
+
+.pair-list {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.pair-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: all var(--t-fast);
+  white-space: nowrap;
+}
+
+.pair-btn:hover { color: var(--text-primary); background: var(--bg-tertiary); border-color: var(--border-light); }
+.pair-btn.active { color: var(--accent-blue); background: var(--accent-blue-dim); border-color: var(--accent-blue); }
+
+.trading-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+}
+
+/* === CHART SECTION === */
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.chart-pair-info h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.price-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  border-radius: var(--r-sm);
+  padding: 0.1rem 0.25rem;
+  margin: 0.25rem 0;
+  transition: background 0.7s ease;
+}
+
+.price-mid {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.bid-ask { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; }
+.spread-dot { color: var(--text-muted); }
+
+.tf-selector {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tf-btn {
+  padding: 0.3rem 0.625rem;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+
+.tf-btn:hover  { color: var(--text-primary); background: var(--bg-tertiary); }
+.tf-btn.active { color: var(--accent-blue); background: var(--accent-blue-dim); border-color: var(--accent-blue); }
+
+.chart-wrapper {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(17,24,39,0.7);
+  backdrop-filter: blur(4px);
+}
+
+.loading-dots {
+  display: flex; gap: 6px; align-items: center;
+}
+.loading-dots span {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  animation: dotPulse 1.4s infinite ease-in-out;
+}
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* === RIGHT PANEL === */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+
+.balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-tertiary);
+  border-radius: var(--r-md);
+  padding: 0.625rem 0.875rem;
+}
+
+.sltp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+
+.order-btns {
+  display: flex;
+  gap: 0.75rem;
+}
+
+
+.position-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+.position-row:last-child { border-bottom: none; }
+
+/* Risk indicator */
+.risk-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  padding: 0.35rem 0.625rem;
+  border-radius: var(--r-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  transition: all var(--t-fast);
+}
+.risk-indicator .risk-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-green);
+  flex-shrink: 0;
+}
+.risk-indicator.risk-warn {
+  color: var(--accent-yellow);
+  border-color: rgba(245,158,11,0.3);
+  background: var(--accent-yellow-dim);
+}
+.risk-indicator.risk-warn .risk-dot { background: var(--accent-yellow); }
+.risk-indicator.risk-danger {
+  color: var(--accent-red);
+  border-color: rgba(255,71,87,0.3);
+  background: var(--accent-red-dim);
+}
+.risk-indicator.risk-danger .risk-dot { background: var(--accent-red); }
+
+/* Margin warn indicator */
+.margin-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-tertiary);
+  border-radius: var(--r-md);
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--border-color);
+  transition: all var(--t-fast);
+}
+.margin-info.margin-warn {
+  border-color: rgba(245,158,11,0.4);
+  background: var(--accent-yellow-dim);
+}
+
+/* Tooltip icon */
+.has-tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  cursor: help;
+  vertical-align: middle;
+  margin-left: 0.25rem;
+  position: relative;
+  font-style: normal;
+}
+.has-tooltip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%; transform: translateX(-50%);
+  background: var(--surface-3);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--r-md);
+  font-size: 0.72rem;
+  white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--t-fast);
+  z-index: 200;
+  box-shadow: var(--shadow-md);
+  width: max-content; max-width: 240px;
+  white-space: normal;
+  text-align: center;
+}
+.has-tooltip:hover::after { opacity: 1; }
+
+@media (max-width: 1200px) {
+  .trading-layout { grid-template-columns: 1fr 280px; }
+}
+
+@media (max-width: 900px) {
+  .trading-layout { grid-template-columns: 1fr; }
+  .trading-page   { height: auto; }
+  .chart-canvas   { height: 350px; }
+}

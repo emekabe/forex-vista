@@ -1,0 +1,133 @@
+<div class="dashboard animate-fade-in">
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Your account overview and performance metrics</p>
+  </div>
+
+  <div class="grid-4 mb-6">
+    <app-stat-card
+      label="Balance"
+      [value]="port.balance"
+      prefix="$"
+      sublabel="Starting capital"
+    />
+    <app-stat-card
+      label="Equity"
+      [value]="port.equity"
+      prefix="$"
+      [highlight]="pnlHighlight(port.equity - port.balance)"
+      [sublabel]="(port.openPnl >= 0 ? '+' : '') + '$' + port.openPnl.toFixed(2) + ' floating P&amp;L'"
+    />
+    <app-stat-card
+      label="Open P&amp;L"
+      [value]="port.openPnl"
+      prefix="$"
+      [highlight]="pnlHighlight(port.openPnl)"
+      [sublabel]="openTrades.length + ' open position' + (openTrades.length === 1 ? '' : 's')"
+    />
+    <app-stat-card
+      label="Free Margin"
+      [value]="port.freeMargin"
+      prefix="$"
+      [sublabel]="port.margin > 0 ? 'Margin level: ' + port.marginLevel.toFixed(0) + '%' : 'No leverage used'"
+    />
+  </div>
+
+  <!-- Performance Stats Row -->
+  <div class="grid-4 mb-6">
+    <app-stat-card label="Total Trades" [value]="stats.totalTrades" [decimals]="0" />
+    <app-stat-card label="Win Rate"     [value]="stats.totalTrades > 0 ? stats.winRate : 0" suffix="%" [decimals]="1" [highlight]="pnlHighlight(stats.winRate - 50)" [sublabel]="stats.totalTrades > 0 ? stats.winningTrades + 'W / ' + stats.losingTrades + 'L' : 'No trades yet'" />
+    <app-stat-card label="Total P&amp;L"    [value]="stats.totalPnl"    prefix="$" [highlight]="pnlHighlight(stats.totalPnl)" />
+    <app-stat-card label="Avg Trade"    [value]="stats.averagePnl"  prefix="$" [highlight]="pnlHighlight(stats.averagePnl)" [sublabel]="stats.bestTrade > 0 ? 'Best: $' + stats.bestTrade.toFixed(2) : ''" />
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Open Positions -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-4">
+        <h3>Open Positions
+          @if (openTrades.length) {
+            <span class="badge badge-blue ml-2">{{ openTrades.length }}</span>
+          }
+        </h3>
+        <a routerLink="/trade" class="btn btn-sm btn-primary">+ New Trade</a>
+      </div>
+
+      @if (openTrades.length === 0) {
+        <div class="empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          <p>No open positions. <a routerLink="/trade">Start trading →</a></p>
+        </div>
+      } @else {
+        <div class="table-container" style="border:none; border-radius:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>Pair</th>
+                <th>Type</th>
+                <th>Lots</th>
+                <th>Open</th>
+                <th>P&amp;L</th>
+                <th>Pips</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of openTrades; track t.id) {
+                <tr>
+                  <td><strong class="text-primary">{{ t.symbol }}</strong></td>
+                  <td>
+                    <span class="badge" [class]="t.direction === 'BUY' ? 'badge-green' : 'badge-red'">{{ t.direction }}</span>
+                  </td>
+                  <td class="mono">{{ t.lots }}</td>
+                  <td class="mono">{{ t.openPrice | number:'1.4-5' }}</td>
+                  <td class="mono" [class]="t.pnl >= 0 ? 'profit' : 'loss'">
+                    {{ t.pnl >= 0 ? '+' : '' }}${{ t.pnl | number:'1.2-2' }}
+                  </td>
+                  <td class="mono" [class]="t.pipsPnl >= 0 ? 'profit' : 'loss'">
+                    {{ t.pipsPnl >= 0 ? '+' : '' }}{{ t.pipsPnl | number:'1.1-1' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Recent Trades -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-4">
+        <h3>Recent Trades</h3>
+        <a routerLink="/history" class="btn btn-sm btn-ghost">View All →</a>
+      </div>
+
+      @if (recentTrades.length === 0) {
+        <div class="empty-state">
+          <p>No trade history yet.</p>
+        </div>
+      } @else {
+        <div class="recent-trades-list">
+          @for (t of recentTrades; track t.id) {
+            <div class="recent-trade-row">
+              <div>
+                <div class="flex items-center gap-2">
+                  <strong class="text-sm">{{ t.symbol }}</strong>
+                  <span class="badge badge-sm" [class]="t.direction === 'BUY' ? 'badge-green' : 'badge-red'">{{ t.direction }}</span>
+                </div>
+                <div class="text-xs text-muted">{{ t.closeTime | date:'MMM d, HH:mm' }}</div>
+              </div>
+              <div class="text-right">
+                <div class="mono font-semibold" [class]="t.pnl >= 0 ? 'profit' : 'loss'">
+                  {{ t.pnl >= 0 ? '+' : '' }}${{ t.pnl | number:'1.2-2' }}
+                </div>
+                <div class="text-xs text-muted">{{ t.lots }} lot(s)</div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
