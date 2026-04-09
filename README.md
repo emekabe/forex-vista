@@ -58,12 +58,13 @@
    npm install
    ```
 3. Set up Environment:
-   Create or update `src/environments/environment.ts` with your Twelve Data API key:
+   Copy the key template and add your Twelve Data API key:
+   ```bash
+   cp src/environments/environment.key.template.ts src/environments/environment.key.ts
+   ```
+   Then, open `src/environments/environment.key.ts` and set your key:
    ```typescript
-   export const environment = {
-     production: false,
-     twelveDataApiKey: 'YOUR_API_KEY_HERE'
-   };
+   export const API_KEY = 'YOUR_API_KEY_HERE';
    ```
 
 ### Running Locally
