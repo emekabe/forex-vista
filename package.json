@@ -5,9 +5,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:ci": "node scripts/generate-env.js && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
+
   "private": true,
   "packageManager": "npm@11.11.0",
   "dependencies": {
