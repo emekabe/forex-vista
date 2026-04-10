@@ -1,0 +1,6 @@
+{
+  "buildCommand": "node scripts/generate-env.js && npx ng build --configuration production",
+  "outputDirectory": "dist/forex-vista/browser",
+  "installCommand": "npm install",
+  "framework": null
+}

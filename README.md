@@ -112,4 +112,37 @@ Navigate to `http://localhost:4200/`.
 
 ---
 
+## 🚢 Deploying to Vercel
+
+The API key is **not committed** to the repository. Vercel generates it at build time from a project environment variable.
+
+### Steps
+
+1. **Import the project** into Vercel from the GitHub repository.
+2. **Add the environment variable** in the Vercel project settings:
+
+   | Variable Name | Value |
+   |---|---|
+   | `TWELVE_DATA_API_KEY` | `your-api-key-here` |
+
+3. **Deploy.** The `vercel.json` build command already handles the rest:
+   ```
+   node scripts/generate-env.js && ng build --configuration production
+   ```
+   This script reads `TWELVE_DATA_API_KEY`, writes `src/environments/environment.key.ts` before Angular compiles, then discards it — the key never touches the repository.
+
+> [!NOTE]
+> If the environment variable is missing, the app silently falls back to **mock data** so the build will still succeed.
+
+---
+
+## 🔗 Screenshots
+
+| Light Mode Dashboard | Trading Panel |
+| :---: | :---: |
+| ![Light Mode](src/assets/screenshots/light-mode.png) | ![Trading Panel](src/assets/screenshots/trading.png) |
+
+---
+
 *Built with ❤️ by Emeka.*
+
